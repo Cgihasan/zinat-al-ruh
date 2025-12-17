@@ -386,7 +386,7 @@ export default function App() {
                                     <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="bg-blue-800 p-3 rounded-lg text-amber-400 hover:bg-amber-500 hover:text-white transition-colors">
                                         <Facebook />
                                     </a>
-                                    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="bg-blue-800 p-3 rounded-lg text-amber-400 hover:bg-amber-500 hover:text-white transition-colors">
+                                    <a href="https://www.instagram.com/zinat_alruh/" target="_blank" rel="noopener noreferrer" className="bg-blue-800 p-3 rounded-lg text-amber-400 hover:bg-amber-500 hover:text-white transition-colors">
                                         <Instagram />
                                     </a>
                                 </div>
