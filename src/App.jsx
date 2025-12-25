@@ -182,7 +182,7 @@ export default function App() {
                             <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-blue-50 rounded-full -z-10"></div>
                             <img 
                                 src="https://images.unsplash.com/photo-1631679706909-1844bbd07221?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                                alt="Interior Design" 
+                                alt="Modern interior design showcase by Zinat Al Ruh" 
                                 className="rounded-2xl shadow-2xl w-full object-cover h-[500px]"
                             />
                             <div className="absolute bottom-8 right-8 bg-white p-6 rounded-xl shadow-lg max-w-xs hidden md:block">
