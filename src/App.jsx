@@ -307,28 +307,28 @@ export default function App() {
                     
                     <div className="grid md:grid-cols-2 gap-8">
                         <div className="group relative overflow-hidden rounded-2xl h-80 cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Bathroom Proposal" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Luxury Bathroom Design by Zinat Al Ruh" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
                                 <span className="text-amber-400 text-sm font-bold uppercase mb-2">Residential</span>
                                 <h3 className="text-2xl font-bold text-white">Luxury Bathroom Design</h3>
                             </div>
                         </div>
                         <div className="group relative overflow-hidden rounded-2xl h-80 cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1565538810643-b5bdb714032a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Kiosk Design" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            <img src="https://images.unsplash.com/photo-1591038676274-1311059f379c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Boutique Flower Shop Kiosk Design" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
                                 <span className="text-amber-400 text-sm font-bold uppercase mb-2">Commercial</span>
                                 <h3 className="text-2xl font-bold text-white">Flower Shop Kiosk</h3>
                             </div>
                         </div>
                         <div className="group relative overflow-hidden rounded-2xl h-80 cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Living Area" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Modern Minimalist Living Space Interior" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
                                 <span className="text-amber-400 text-sm font-bold uppercase mb-2">Interior Fit-out</span>
                                 <h3 className="text-2xl font-bold text-white">Modern Living Space</h3>
                             </div>
                         </div>
                         <div className="group relative overflow-hidden rounded-2xl h-80 cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1504328345606-18aff75f8732?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Technical Works" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            <img src="https://images.unsplash.com/photo-1621905252507-b354bcadc250?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Professional HVAC Installation and Maintenance" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
                                 <span className="text-amber-400 text-sm font-bold uppercase mb-2">Technical Services</span>
                                 <h3 className="text-2xl font-bold text-white">Office HVAC Installation</h3>
