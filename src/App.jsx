@@ -314,7 +314,7 @@ export default function App() {
                             </div>
                         </div>
                         <div className="group relative overflow-hidden rounded-2xl h-80 cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1591038676274-1311059f379c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Boutique Flower Shop Kiosk Design" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Boutique Flower Shop Kiosk Design" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
                                 <span className="text-amber-400 text-sm font-bold uppercase mb-2">Commercial</span>
                                 <h3 className="text-2xl font-bold text-white">Flower Shop Kiosk</h3>
@@ -328,7 +328,7 @@ export default function App() {
                             </div>
                         </div>
                         <div className="group relative overflow-hidden rounded-2xl h-80 cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1621905252507-b354bcadc250?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Professional HVAC Installation and Maintenance" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Professional HVAC Installation and Maintenance" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
                             <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
                                 <span className="text-amber-400 text-sm font-bold uppercase mb-2">Technical Services</span>
                                 <h3 className="text-2xl font-bold text-white">Office HVAC Installation</h3>
