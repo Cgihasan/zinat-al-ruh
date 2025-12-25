@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
     Menu, X, Phone, Mail, MapPin, CheckCircle, Hammer, Wrench, 
     Fan, ShieldCheck, Clock, HeartHandshake, Lightbulb, Award, 
-    Zap, Droplets, Brush, LayoutGrid, Facebook, Instagram
+    Zap, Droplets, Brush, LayoutGrid, Linkedin, Instagram
 } from 'lucide-react';
 
 const Button = ({ children, variant = 'primary', className = '', ...props }) => {
@@ -383,8 +383,8 @@ export default function App() {
                             <div className="mt-8 pt-8 border-t border-slate-800">
                                 <h4 className="font-bold text-lg mb-4">Follow Us</h4>
                                 <div className="flex gap-4">
-                                    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="bg-blue-800 p-3 rounded-lg text-amber-400 hover:bg-amber-500 hover:text-white transition-colors">
-                                        <Facebook />
+                                    <a href="https://www.linkedin.com/company/zinatalruh" target="_blank" rel="noopener noreferrer" className="bg-blue-800 p-3 rounded-lg text-amber-400 hover:bg-amber-500 hover:text-white transition-colors">
+                                        <Linkedin />
                                     </a>
                                     <a href="https://www.instagram.com/zinat_alruh/" target="_blank" rel="noopener noreferrer" className="bg-blue-800 p-3 rounded-lg text-amber-400 hover:bg-amber-500 hover:text-white transition-colors">
                                         <Instagram />
