@@ -457,10 +457,10 @@ export default function App() {
                             </div>
                         </div>
                         <div className="flex gap-8 text-sm">
-                            <a href="#" className="hover:text-amber-500 transition-colors">Home</a>
-                            <a href="#" className="hover:text-amber-500 transition-colors">Services</a>
-                            <a href="#" className="hover:text-amber-500 transition-colors">Projects</a>
-                            <a href="#" className="hover:text-amber-500 transition-colors">Contact</a>
+                            <button onClick={() => scrollToSection('hero')} className="hover:text-amber-500 transition-colors">Home</button>
+                            <button onClick={() => scrollToSection('services')} className="hover:text-amber-500 transition-colors">Services</button>
+                            <button onClick={() => scrollToSection('projects')} className="hover:text-amber-500 transition-colors">Projects</button>
+                            <button onClick={() => scrollToSection('contact')} className="hover:text-amber-500 transition-colors">Contact</button>
                         </div>
                         <p className="text-sm">© {new Date().getFullYear()} Zinat Al Ruh. All rights reserved.</p>
                     </div>
