@@ -4,7 +4,7 @@ import {
     MapPin, Phone, Mail, Linkedin, Instagram, Play, Menu, X
 } from 'lucide-react';
 
-/* Hallmark · genre: editorial · macrostructure: Marquee Hero · theme: studied-DNA · enrichment: CAD-wireframe-SVG · nav: N9 · footer: Ft6 · Luxurious Technical Minimalism */
+/* Hallmark - genre: editorial · macrostructure: Marquee Hero · theme: studied-DNA · enrichment: CAD-wireframe-SVG · nav: N9 · footer: Ft6 · Luxurious Technical Minimalism */
 
 export default function App() {
     // Form state variables
