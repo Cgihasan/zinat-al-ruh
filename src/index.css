@@ -231,8 +231,3 @@ input:focus-visible {
   font-family: var(--font-label);
 }
 
-/* 
-.tabular-nums {
-  font-variant-numeric: tabular-nums;
-  font-family: var(--font-label);
-} */
