@@ -1,468 +1,852 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    Menu, X, Phone, Mail, MapPin, CheckCircle, Hammer, Wrench, 
-    Fan, ShieldCheck, Clock, HeartHandshake, Lightbulb, Award, 
-    Zap, Droplets, Brush, LayoutGrid, Linkedin, Instagram
+    ArrowRight, Check, AlertCircle, Loader2, 
+    MapPin, Phone, Mail, Linkedin, Instagram, Play, Menu, X
 } from 'lucide-react';
 
-const Button = ({ children, variant = 'primary', className = '', ...props }) => {
-    const baseStyles = "px-8 py-3 rounded-full font-medium transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg";
-    const variants = {
-        primary: "bg-blue-900 text-white hover:bg-blue-800 border-2 border-transparent",
-        secondary: "bg-transparent border-2 border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white",
-        gold: "bg-gradient-to-r from-amber-400 to-amber-600 text-white border-none shadow-md"
-    };
-    return (
-        <button className={`${baseStyles} ${variants[variant]} ${className}`} {...props}>
-            {children}
-        </button>
-    );
-};
-
-const SectionTitle = ({ subtitle, title, centered = true }) => (
-    <div className={`mb-12 ${centered ? 'text-center' : ''}`}>
-        <span className="text-amber-600 font-bold uppercase tracking-wider text-sm mb-2 block">{subtitle}</span>
-        <h2 className="text-4xl font-bold text-slate-900 relative inline-block pb-4">
-            {title}
-            <span className={`absolute bottom-0 ${centered ? 'left-1/2 -translate-x-1/2' : 'left-0'} w-24 h-1 bg-amber-500 rounded-full`}></span>
-        </h2>
-    </div>
-);
+/* Hallmark · genre: editorial · macrostructure: Marquee Hero · theme: studied-DNA · enrichment: CAD-wireframe-SVG · nav: N9 · footer: Ft6 · Luxurious Technical Minimalism */
 
 export default function App() {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [activeService, setActiveService] = useState('all');
-    const [scrolled, setScrolled] = useState(false);
+    // Form state variables
+    const [formValues, setFormValues] = useState({
+        name: '',
+        phone: '',
+        email: '',
+        service: 'Interior Design',
+        message: ''
+    });
 
+    const [errors, setErrors] = useState({
+        name: '',
+        phone: '',
+        email: '',
+        message: ''
+    });
+
+    const [touched, setTouched] = useState({
+        name: false,
+        phone: false,
+        email: false,
+        message: false
+    });
+
+    const [formStatus, setFormStatus] = useState('idle'); // idle | loading | success
+    const [activeSection, setActiveSection] = useState('01');
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+    // Scroll active tracking using IntersectionObserver
     useEffect(() => {
-        const handleScroll = () => {
-            setScrolled(window.scrollY > 50);
+        const sections = ['hero', 'services', 'projects', 'materiality', 'about', 'contact'];
+        const sectionMap = {
+            'hero': '01',
+            'services': '02',
+            'projects': '03',
+            'materiality': '04',
+            'about': '05',
+            'contact': '06'
         };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-30% 0px -50% 0px', // Trigger when section occupies center-view
+            threshold: 0
+        };
+
+        const observerCallback = (entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const sectionId = entry.target.id;
+                    if (sectionMap[sectionId]) {
+                        setActiveSection(sectionMap[sectionId]);
+                    }
+                }
+            });
+        };
+
+        const observer = new IntersectionObserver(observerCallback, observerOptions);
+        
+        sections.forEach(secId => {
+            const el = document.getElementById(secId);
+            if (el) observer.observe(el);
+        });
+
+        return () => observer.disconnect();
     }, []);
 
-    const services = [
-        { id: 'construction', title: 'Floor & Wall Tiling', icon: <LayoutGrid />, desc: 'Premium ceramic, porcelain, and marble installation for elegant spaces.' },
-        { id: 'construction', title: 'Plaster Works', icon: <Hammer />, desc: 'Flawless wall finishes and restorative plastering for smooth surfaces.' },
-        { id: 'construction', title: 'Wallpaper Fixing', icon: <Brush />, desc: 'Expert installation of decorative wallpapers to enhance interior aesthetics.' },
-        { id: 'construction', title: 'False Ceiling', icon: <LayoutGrid />, desc: 'Modern gypsum and suspended ceiling designs with integrated lighting.' },
-        { id: 'technical', title: 'Electrical Fittings', icon: <Zap />, desc: 'Complete electrical wiring, fixture installation, and safety checks.' },
-        { id: 'technical', title: 'Plumbing & Sanitary', icon: <Droplets />, desc: 'Professional installation of sanitary ware, piping, and drainage systems.' },
-        { id: 'specialized', title: 'Air Conditioning', icon: <Fan />, desc: 'Installation, maintenance, and repair of HVAC systems for optimal cooling.' },
-        { id: 'specialized', title: 'Ventilation Systems', icon: <Fan />, desc: 'Advanced air filtration and ventilation solutions for healthy environments.' },
-    ];
+    // Validate a single field
+    const validateField = (name, value) => {
+        let error = '';
+        if (!value && name !== 'phone') {
+            error = `${name.charAt(0).toUpperCase() + name.slice(1)} is required.`;
+        } else if (name === 'email' && value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(value)) {
+                error = 'Please enter a valid email address.';
+            }
+        }
+        return error;
+    };
 
-    const filterServices = activeService === 'all' 
-        ? services 
-        : services.filter(s => s.id === activeService);
+    // Handle change
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormValues(prev => ({ ...prev, [name]: value }));
+        
+        // If field was already touched, validate on keystroke
+        if (touched[name]) {
+            const error = validateField(name, value);
+            setErrors(prev => ({ ...prev, [name]: error }));
+        }
+    };
 
+    // Handle blur
+    const handleBlur = (e) => {
+        const { name, value } = e.target;
+        setTouched(prev => ({ ...prev, [name]: true }));
+        const error = validateField(name, value);
+        setErrors(prev => ({ ...prev, [name]: error }));
+    };
+
+    // Handle submit
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // Mark all as touched
+        const newTouched = { name: true, phone: true, email: true, message: true };
+        setTouched(newTouched);
+
+        // Validate all fields
+        const newErrors = {
+            name: validateField('name', formValues.name),
+            phone: validateField('phone', formValues.phone),
+            email: validateField('email', formValues.email),
+            message: validateField('message', formValues.message)
+        };
+
+        setErrors(newErrors);
+
+        const hasErrors = Object.values(newErrors).some(err => err !== '');
+        if (hasErrors) return;
+
+        setFormStatus('loading');
+
+        setTimeout(() => {
+            setFormStatus('success');
+            setTimeout(() => {
+                setFormValues({
+                    name: '',
+                    phone: '',
+                    email: '',
+                    service: 'Interior Design',
+                    message: ''
+                });
+                setTouched({ name: false, phone: false, email: false, message: false });
+                setFormStatus('idle');
+            }, 3000);
+        }, 1500);
+    };
+
+    // Smooth scroll navigation
     const scrollToSection = (id) => {
         const element = document.getElementById(id);
         if (element) {
             element.scrollIntoView({ behavior: 'smooth' });
-            setIsMenuOpen(false);
         }
     };
 
+    const coreServices = [
+        { num: '01', title: 'INTERIOR FIT-OUT', desc: 'Complete turn-key commercial and high-end residential interior contracting.' },
+        { num: '02', title: 'RENOVATION & FINISHING', desc: 'Master craftsmanship in plastering, marble tiling, and luxury painting.' },
+        { num: '03', title: 'GLASS & ALUMINIUM', desc: 'Custom architectural facades, glazing partitions, and slim-profile windows.' },
+        { num: '04', title: 'FLOORING WORKS', desc: 'Precision parquet installations, microcement coatings, and heavy stone layouts.' },
+        { num: '05', title: 'CUSTOM INTERIOR', desc: 'Tailored fitments, acoustic paneling, and architectural gypsum ceilings.' },
+        { num: '06', title: 'TECHNICAL SERVICES', desc: 'High-efficiency HVAC installations, engineering designs, electrical & plumbing.' }
+    ];
+
+    const projectShowcase = [
+        { 
+            num: '01', 
+            type: 'Residential', 
+            title: 'The Palm Residence', 
+            img: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 
+            desc: 'A minimalist luxury villa fit-out embracing expansive sea views. The design vocabulary focuses on seamless transitions, utilizing expansive planar surfaces and muted natural tones.',
+            caption: '[03 — The Palm residence stone fit-out]' 
+        },
+        { 
+            num: '02', 
+            type: 'Commercial', 
+            title: 'Al Maha Executive Suites', 
+            img: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 
+            desc: 'Commercial excellence in Downtown Dubai. A rigorous study in corporate luxury, employing rich walnut veneers, understated brass accents, and custom acoustical treatments.',
+            caption: '[04 — Downtown Business Bay office execution]' 
+        },
+        { 
+            num: '03', 
+            type: 'Cultural', 
+            title: 'Royal Majlis', 
+            img: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80', 
+            desc: 'Traditional elegance with a modern architectural twist. Reinterpreting heritage motifs through a contemporary lens, featuring bespoke geometric lattice work.',
+            caption: '[05 — Jumeirah Royal Majlis gypsum fitment]' 
+        }
+    ];
+
     return (
-        <div className="min-h-screen flex flex-col bg-red-50 text-slate-800 font-sans">
-            {/* Global Styles & Fonts */}
-            <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
-                body { font-family: 'Montserrat', sans-serif; }
-                h1, h2, h3, h4 { font-family: 'Playfair Display', serif; }
-                .text-gold { background: linear-gradient(135deg, #BF953F, #B38728, #AA771C); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-                @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-                .fade-in { animation: fadeIn 1s ease-in; }
-            `}</style>
-
-            {/* Navbar */}
-            <nav className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg py-2' : 'bg-transparent py-6'}`}>
-                <div className="container mx-auto px-6 flex justify-between items-center">
-                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => scrollToSection('hero')}>
-                        {/* Logo Image - Local File */}
-                        <img 
-                            src="Zinat Al RuhFinal Logo Updated Version-02.jpg" 
-                            alt="Zinat Al Ruh" 
-                            className="h-16 w-auto object-contain"
-                            onError={(e) => {
-                                // Fallback if image fails to load
-                                e.target.style.display = 'none';
-                                if(e.target.nextSibling) {
-                                    e.target.nextSibling.classList.remove('hidden');
-                                    e.target.nextSibling.style.display = 'flex';
-                                }
-                            }}
-                        />
-                        {/* Text Fallback (Hidden if image loads successfully) */}
-                        <div className="flex flex-col hidden">
-                            <h1 className={`text-xl font-bold tracking-widest ${scrolled ? 'text-blue-900' : 'text-blue-900 md:text-white'}`}>
-                                ZINAT <span className="text-amber-500">AL RUH</span>
-                            </h1>
-                            <span className={`text-[0.5rem] tracking-[0.2em] uppercase ${scrolled ? 'text-slate-600' : 'text-slate-200 md:text-slate-200'}`}>Technical Services LLC</span>
-                        </div>
+        <div className="min-h-screen flex flex-col bg-[var(--color-paper)] text-[var(--color-ink)] selection:bg-[var(--color-accent)] selection:text-[var(--color-accent-ink)] rounded-none">
+            
+            {/* Header Navigation Archetype: N9 / Custom studied mix */}
+            <header className="w-full fixed top-0 left-0 bg-[var(--color-paper)]/85 backdrop-blur-md z-50 border-b-[0.5px] border-[var(--color-rule)]">
+                <div className="max-w-[var(--spacing-container-max)] mx-auto px-6 md:px-20 h-20 flex justify-between items-center">
+                    <div className="flex flex-col cursor-pointer" onClick={() => scrollToSection('hero')}>
+                        <span className="font-display text-xl tracking-[var(--tracking-label)] uppercase text-[var(--color-ink)] font-normal">
+                            ZINAT AL RUH
+                        </span>
+                        <span className="font-label text-[0.55rem] tracking-[0.25em] uppercase text-[var(--color-accent)] font-semibold mt-1">
+                            Technical Services LLC
+                        </span>
                     </div>
 
-                    {/* Desktop Menu */}
-                    <div className="hidden md:flex items-center space-x-8">
-                        {['Home', 'About', 'Services', 'Projects', 'Contact'].map((item) => (
-                            <button 
-                                key={item} 
-                                onClick={() => scrollToSection(item.toLowerCase() === 'home' ? 'hero' : item.toLowerCase())}
-                                className={`font-medium text-sm uppercase tracking-wide hover:text-amber-500 transition-colors ${scrolled ? 'text-slate-700' : 'text-white'}`}
-                            >
-                                {item}
-                            </button>
-                        ))}
-                        <Button variant="gold" onClick={() => scrollToSection('contact')}>Get Quote</Button>
-                    </div>
+                    {/* Desktop Menu Link Rows */}
+                    <nav className="hidden md:flex items-center gap-[var(--spacing-lg)]">
+                        <button onClick={() => scrollToSection('hero')} className="font-label text-xs uppercase tracking-widest text-[var(--color-neutral)] hover:text-[var(--color-accent)] transition-colors">Home</button>
+                        <button onClick={() => scrollToSection('services')} className="font-label text-xs uppercase tracking-widest text-[var(--color-neutral)] hover:text-[var(--color-accent)] transition-colors">Services</button>
+                        <button onClick={() => scrollToSection('projects')} className="font-label text-xs uppercase tracking-widest text-[var(--color-neutral)] hover:text-[var(--color-accent)] transition-colors">Projects</button>
+                        <button onClick={() => scrollToSection('materiality')} className="font-label text-xs uppercase tracking-widest text-[var(--color-neutral)] hover:text-[var(--color-accent)] transition-colors">Materiality</button>
+                        <button onClick={() => scrollToSection('about')} className="font-label text-xs uppercase tracking-widest text-[var(--color-neutral)] hover:text-[var(--color-accent)] transition-colors">Philosophy</button>
+                        <button onClick={() => scrollToSection('contact')} className="font-label text-xs uppercase tracking-widest text-[var(--color-neutral)] hover:text-[var(--color-accent)] transition-colors">Contact</button>
+                    </nav>
 
-                    {/* Mobile Toggle */}
-                    <div className="md:hidden text-amber-500 cursor-pointer" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                        {isMenuOpen ? <X /> : <Menu />}
-                    </div>
-                </div>
-
-                {/* Mobile Menu */}
-                {isMenuOpen && (
-                    <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl py-6 px-6 flex flex-col gap-4">
-                        {['Home', 'About', 'Services', 'Projects', 'Contact'].map((item) => (
-                            <button 
-                                key={item} 
-                                onClick={() => scrollToSection(item.toLowerCase() === 'home' ? 'hero' : item.toLowerCase())}
-                                className="text-left text-slate-800 font-medium hover:text-amber-600"
-                            >
-                                {item}
-                            </button>
-                        ))}
-                        <Button variant="gold" onClick={() => scrollToSection('contact')}>Get Quote</Button>
-                    </div>
-                )}
-            </nav>
-
-            {/* Hero Section */}
-            <section id="hero" className="relative h-screen flex items-center justify-center overflow-hidden">
-                <div className="absolute inset-0 bg-slate-900">
-                    <img 
-                        src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2053&q=80" 
-                        alt="Luxury Interior" 
-                        className="w-full h-full object-cover opacity-50"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/50 to-slate-900/80"></div>
-                </div>
-
-                <div className="container mx-auto px-6 relative z-10 text-center text-white mt-16">
-                    <div className="inline-block border border-amber-500/50 bg-slate-900/30 backdrop-blur-sm px-6 py-2 rounded-full mb-6 fade-in">
-                        <span className="text-amber-400 uppercase tracking-wider text-xs font-bold">Established in Dubai</span>
-                    </div>
-                    <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight fade-in">
-                        Complete Interior <br/> 
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">Solutions</span>
-                    </h1>
-                    <p className="text-xl md:text-2xl text-slate-200 mb-10 max-w-3xl mx-auto font-light fade-in">
-                        Premier interior and construction services for homes, offices, and commercial spaces in Dubai. 
-                        Craftsmanship, Quality, and Innovation.
-                    </p>
-                    <div className="flex flex-col md:flex-row gap-4 justify-center fade-in">
-                        <Button variant="gold" onClick={() => scrollToSection('services')}>Explore Services</Button>
-                        <button onClick={() => scrollToSection('about')} className="px-8 py-3 rounded-full font-medium transition-all duration-300 border-2 border-white text-white hover:bg-white hover:text-slate-900">
-                            Who We Are
+                    <div className="flex items-center gap-[var(--spacing-md)]">
+                        <button 
+                            onClick={() => scrollToSection('contact')}
+                            className="hidden sm:block h-10 px-5 border-[0.5px] border-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-ink)] text-[var(--color-accent)] font-label text-[0.65rem] uppercase tracking-widest transition-all rounded-none"
+                        >
+                            Start a Project →
+                        </button>
+                        <button 
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                            className="text-[var(--color-ink)] p-2 hover:text-[var(--color-accent)] transition-colors md:hidden"
+                            aria-label="Toggle mobile menu"
+                        >
+                            <Menu size={20} />
                         </button>
                     </div>
                 </div>
-            </section>
+            </header>
 
-            {/* About Section - Mission & Vision */}
-            <section id="about" className="py-20 bg-white">
-                <div className="container mx-auto px-6">
-                    <div className="grid md:grid-cols-2 gap-16 items-center">
-                        <div className="relative">
-                            <div className="absolute -top-4 -left-4 w-24 h-24 bg-amber-100 rounded-full -z-10"></div>
-                            <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-blue-50 rounded-full -z-10"></div>
-                            <img 
-                                src="https://images.unsplash.com/photo-1631679706909-1844bbd07221?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                                alt="Modern interior design showcase by Zinat Al Ruh" 
-                                className="rounded-2xl shadow-2xl w-full object-cover h-[500px]"
-                            />
-                            <div className="absolute bottom-8 right-8 bg-white p-6 rounded-xl shadow-lg max-w-xs hidden md:block">
-                                <div className="flex items-center gap-3 mb-2">
-                                    <div className="p-2 bg-amber-500 rounded-full text-white">
-                                        <ShieldCheck size={20} />
-                                    </div>
-                                    <span className="font-bold text-slate-900">ISO Standards</span>
-                                </div>
-                                <p className="text-sm text-slate-600">Strict adherence to international safety protocols and regulations.</p>
+            {/* Mobile Menu Drawer Overlay */}
+            {isMobileMenuOpen && (
+                <div className="fixed inset-0 bg-[var(--color-paper)] z-50 flex flex-col justify-center items-center gap-[var(--spacing-lg)] p-8">
+                    <button 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="absolute top-6 right-6 font-label text-xs uppercase tracking-widest text-[var(--color-neutral)] hover:text-[var(--color-accent)] transition-colors p-2"
+                    >
+                        Close [×]
+                    </button>
+                    <div className="flex flex-col items-center gap-[var(--spacing-md)] text-center">
+                        <span className="font-label text-[0.6rem] tracking-[0.25em] text-[var(--color-accent)] uppercase mb-2">Navigation</span>
+                        <button 
+                            onClick={() => { scrollToSection('hero'); setIsMobileMenuOpen(false); }}
+                            className="font-display text-3xl text-[var(--color-ink)] hover:text-[var(--color-accent)] transition-colors py-2"
+                        >
+                            Home
+                        </button>
+                        <button 
+                            onClick={() => { scrollToSection('services'); setIsMobileMenuOpen(false); }}
+                            className="font-display text-3xl text-[var(--color-ink)] hover:text-[var(--color-accent)] transition-colors py-2"
+                        >
+                            Services
+                        </button>
+                        <button 
+                            onClick={() => { scrollToSection('projects'); setIsMobileMenuOpen(false); }}
+                            className="font-display text-3xl text-[var(--color-ink)] hover:text-[var(--color-accent)] transition-colors py-2"
+                        >
+                            Projects
+                        </button>
+                        <button 
+                            onClick={() => { scrollToSection('materiality'); setIsMobileMenuOpen(false); }}
+                            className="font-display text-3xl text-[var(--color-ink)] hover:text-[var(--color-accent)] transition-colors py-2"
+                        >
+                            Materiality
+                        </button>
+                        <button 
+                            onClick={() => { scrollToSection('about'); setIsMobileMenuOpen(false); }}
+                            className="font-display text-3xl text-[var(--color-ink)] hover:text-[var(--color-accent)] transition-colors py-2"
+                        >
+                            Philosophy
+                        </button>
+                        <button 
+                            onClick={() => { scrollToSection('contact'); setIsMobileMenuOpen(false); }}
+                            className="font-display text-3xl text-[var(--color-ink)] hover:text-[var(--color-accent)] transition-colors py-2"
+                        >
+                            Contact
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            <main className="flex-grow pt-20">
+                
+                {/* Hero Section: studied Marquee Hero + Right-Aligned Vertical Rail */}
+                <section id="hero" className="relative min-h-screen lg:h-[90vh] flex items-center justify-center border-b-[0.5px] border-[var(--color-rule)] overflow-hidden select-none bg-[var(--color-paper-2)]">
+                    {/* Architectural elegant background */}
+                    <div className="absolute inset-0 z-0">
+                        <img 
+                            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
+                            alt="Luxury Architecture background" 
+                            className="w-full h-full object-cover opacity-[0.07] mix-blend-multiply"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[var(--color-paper)]/30 to-[var(--color-paper)]"></div>
+                        
+                        {/* Elegant atmospheric blurred point */}
+                        <div className="absolute top-1/4 right-1/4 w-[28rem] h-[28rem] rounded-full bg-[var(--color-accent)]/5 blur-[100px] -z-10"></div>
+                        <div className="absolute bottom-1/4 left-1/4 w-[32rem] h-[32rem] rounded-full bg-[var(--color-accent)]/3 blur-[120px] -z-10"></div>
+                    </div>
+
+                    <div className="max-w-[var(--spacing-container-max)] w-full mx-auto px-6 md:px-20 relative z-10 grid lg:grid-cols-12 gap-[var(--spacing-xl)] items-center">
+                        {/* Left Side: Massive High-Contrast Typography */}
+                        <div className="lg:col-span-8 flex flex-col items-start pt-12 text-left">
+                            <span className="font-label text-xs uppercase tracking-[var(--tracking-label)] text-[var(--color-accent)] mb-[var(--spacing-xs)] font-semibold">
+                                We Transform Spaces
+                            </span>
+                            <h1 className="text-display mb-[var(--spacing-md)] text-[var(--color-ink)] leading-[1.05] tracking-[var(--tracking-display)] select-none">
+                                Design. Build. <br />
+                                Supervise. <span className="text-[var(--color-accent)] italic font-light">Deliver.</span>
+                            </h1>
+                            <p className="font-serif text-lg md:text-xl text-[var(--color-neutral)] leading-[var(--lh-snug)] max-w-[42ch] mb-[var(--spacing-xl)] font-light">
+                                Premium Interior Fit-Out & Technical Services in Dubai, United Arab Emirates.
+                            </p>
+
+                            <div className="flex items-center gap-[var(--spacing-lg)]">
+                                <button 
+                                    onClick={() => scrollToSection('contact')}
+                                    className="w-14 h-14 rounded-full border-[0.5px] border-[var(--color-accent)] hover:bg-[var(--color-accent)] hover:text-[var(--color-accent-ink)] text-[var(--color-accent)] flex items-center justify-center transition-all group"
+                                    aria-label="Play showreel"
+                                >
+                                    <Play size={16} className="fill-current translate-x-[1px]" />
+                                </button>
+                                <span className="font-label text-xs uppercase tracking-widest text-[var(--color-neutral)] font-semibold">
+                                    Play Showreel
+                                </span>
                             </div>
                         </div>
 
-                        <div>
-                            <SectionTitle subtitle="About Zinat Al Ruh" title="Crafting Spaces That Inspire" centered={false} />
-                            <p className="text-slate-600 mb-6 leading-relaxed text-lg">
-                                Zinat Al Ruh is a premier interior and technical services company based in Dubai. 
-                                We provide complete interior and construction solutions tailored to meet the unique needs of 
-                                homes, offices, and commercial establishments.
-                            </p>
-                            <p className="text-slate-600 mb-8 leading-relaxed">
-                                Our commitment to craftsmanship, quality, and innovation drives us to deliver spaces that 
-                                enhance everyday life.
-                            </p>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="bg-slate-50 p-6 rounded-xl border-l-4 border-blue-900">
-                                    <h3 className="text-xl font-bold text-blue-900 mb-3">Our Mission</h3>
-                                    <p className="text-slate-600 text-sm">To deliver exceptional interior solutions combining quality craftsmanship, creative innovation, and genuine commitment to excellence.</p>
-                                </div>
-                                <div className="bg-slate-50 p-6 rounded-xl border-l-4 border-amber-500">
-                                    <h3 className="text-xl font-bold text-amber-600 mb-3">Our Vision</h3>
-                                    <p className="text-slate-600 text-sm">To be the leading provider of comprehensive interior solutions recognized for reliability and unwavering dedication.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Core Values */}
-            <section className="py-16 bg-slate-900 text-white">
-                <div className="container mx-auto px-6">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                        {[
-                            { icon: <Award />, title: 'Quality', desc: 'Excellence in every detail' },
-                            { icon: <HeartHandshake />, title: 'Integrity', desc: 'Honesty & transparency' },
-                            { icon: <Clock />, title: 'Reliability', desc: 'Deadlines consistently met' },
-                            { icon: <Lightbulb />, title: 'Innovation', desc: 'New technologies & methods' },
-                        ].map((value, idx) => (
-                            <div key={idx} className="p-6 border border-slate-700 rounded-xl hover:bg-slate-800 transition-colors">
-                                <div className="text-amber-500 flex justify-center mb-4 scale-125">{value.icon}</div>
-                                <h3 className="text-xl font-bold mb-2">{value.title}</h3>
-                                <p className="text-slate-400 text-sm">{value.desc}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Services Section */}
-            <section id="services" className="py-24 bg-slate-50">
-                <div className="container mx-auto px-6">
-                    <SectionTitle subtitle="Our Expertise" title="Comprehensive Services" />
-
-                    {/* Tabs */}
-                    <div className="flex flex-wrap justify-center gap-4 mb-12">
-                        {[
-                            { id: 'all', label: 'All Services' },
-                            { id: 'construction', label: 'Construction' },
-                            { id: 'technical', label: 'Technical' },
-                            { id: 'specialized', label: 'Specialized' }
-                        ].map((tab) => (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveService(tab.id)}
-                                className={`px-6 py-2 rounded-full font-medium transition-all ${
-                                    activeService === tab.id 
-                                    ? 'bg-blue-900 text-white shadow-lg' 
-                                    : 'bg-white text-slate-600 hover:bg-blue-50'
-                                }`}
-                            >
-                                {tab.label}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Service Grid */}
-                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                        {filterServices.map((service, index) => (
-                            <div key={index} className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100">
-                                <div className="w-14 h-14 bg-blue-50 rounded-xl flex items-center justify-center text-blue-900 mb-6 group-hover:bg-blue-900 group-hover:text-white transition-colors">
-                                    {service.icon}
-                                </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-amber-600 transition-colors">{service.title}</h3>
-                                <p className="text-slate-500 text-sm leading-relaxed">
-                                    {service.desc}
-                                </p>
-                            </div>
-                        ))}
-                    </div>
-                    
-                    {/* Other Services List */}
-                    <div className="mt-16 bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
-                        <h3 className="text-2xl font-bold text-center mb-8">Additional Specialized Services</h3>
-                        <div className="grid md:grid-cols-3 gap-4 text-center">
-                            {['Building Cleaning', 'Water Well Drilling', 'Light Partitions', 'Maintenance Contracts', 'Gypsum Works', 'Floor Polishing'].map((item, i) => (
-                                <div key={i} className="flex items-center justify-center gap-2 text-slate-700 py-2 bg-slate-50 rounded-lg">
-                                    <CheckCircle size={16} className="text-amber-500" />
-                                    <span className="font-medium">{item}</span>
+                        {/* Right Side: Vertical Scroll Navigation Rail */}
+                        <div className="lg:col-span-4 hidden lg:flex flex-col items-end relative h-[320px] justify-between pr-4">
+                            <div className="progress-line right-7"></div>
+                            
+                            {[
+                                { num: '01', label: 'HOME', secId: 'hero' },
+                                { num: '02', label: 'SERVICES', secId: 'services' },
+                                { num: '03', label: 'PROJECTS', secId: 'projects' },
+                                { num: '04', label: 'MATERIALITY', secId: 'materiality' },
+                                { num: '05', label: 'ABOUT', secId: 'about' },
+                                { num: '06', label: 'CONTACT', secId: 'contact' }
+                            ].map((node) => (
+                                <div 
+                                    key={node.num}
+                                    onClick={() => scrollToSection(node.secId)}
+                                    className={`progress-node ${activeSection === node.num ? 'active' : ''}`}
+                                >
+                                    <span className={`font-label text-[0.65rem] tracking-[0.2em] transition-colors ${activeSection === node.num ? 'text-[var(--color-accent)] font-bold' : 'text-[var(--color-muted)] hover:text-[var(--color-accent)]'}`}>
+                                        {node.num} <span className="ml-2 font-body font-medium select-none">{node.label}</span>
+                                    </span>
+                                    <div className="node-dot"></div>
                                 </div>
                             ))}
                         </div>
                     </div>
-                </div>
-            </section>
 
-            {/* Projects / Portfolio */}
-            <section id="projects" className="py-20 bg-white">
-                <div className="container mx-auto px-6">
-                    <SectionTitle subtitle="Our Work" title="Recent Projects" />
-                    
-                    <div className="grid md:grid-cols-2 gap-8">
-                        <div className="group relative overflow-hidden rounded-2xl h-80 cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1584622650111-993a426fbf0a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Luxury Bathroom Design by Zinat Al Ruh" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
-                                <span className="text-amber-400 text-sm font-bold uppercase mb-2">Residential</span>
-                                <h3 className="text-2xl font-bold text-white">Luxury Bathroom Design</h3>
+                    {/* Centered Scroll Indicator */}
+                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer" onClick={() => scrollToSection('services')}>
+                        <div className="w-5 h-8 border border-[var(--color-rule)] rounded-full flex justify-center p-[2px]">
+                            <div className="w-1 h-2 bg-[var(--color-accent)] rounded-full animate-bounce"></div>
+                        </div>
+                        <span className="font-label text-[0.55rem] tracking-[0.3em] text-[var(--color-muted)] uppercase font-semibold">
+                            Scroll
+                        </span>
+                    </div>
+                </section>
+
+                {/* Services Section: 6 Glowing Glass Cards + CAD Wireframe SVG */}
+                <section id="services" className="max-w-[var(--spacing-container-max)] mx-auto px-6 md:px-20 py-[var(--spacing-2xl)] md:py-[var(--spacing-3xl)] border-b-[0.5px] border-[var(--color-rule)]">
+                    <div className="grid lg:grid-cols-12 gap-[var(--spacing-xl)] items-start">
+                        
+                        {/* Left Side: Services Heading & Content */}
+                        <div className="lg:col-span-8">
+                            <div className="mb-[var(--spacing-xl)] text-left">
+                                <span className="font-label text-xs uppercase tracking-[var(--tracking-label)] text-[var(--color-accent)] block mb-[var(--spacing-xs)] font-semibold">
+                                    Our Services
+                                </span>
+                                <h2 className="text-display-s text-[var(--color-ink)] max-w-[20ch]">
+                                    Crafting Spaces. Creating Experiences.
+                                </h2>
+                            </div>
+
+                            {/* 6 Glowing Glass Cards */}
+                            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-[var(--spacing-md)] mb-[var(--spacing-lg)]">
+                                {coreServices.map((val, idx) => (
+                                    <div key={idx} className="glass-panel p-6 flex flex-col items-start min-h-[190px] justify-between cursor-pointer rounded-none">
+                                        <div className="w-full flex justify-between items-baseline border-b border-[var(--color-rule)] pb-3">
+                                            <span className="font-display text-sm text-[var(--color-accent)] font-semibold">{val.num}</span>
+                                            <span className="font-label text-[0.6rem] text-[var(--color-muted)] tracking-wider font-semibold">FIT-OUT</span>
+                                        </div>
+                                        <div className="mt-4 flex-grow text-left">
+                                            <h4 className="font-label text-[0.75rem] font-bold uppercase tracking-widest text-[var(--color-ink)] mb-2 group-hover:text-[var(--color-accent)] transition-colors">{val.title}</h4>
+                                            <p className="text-[0.75rem] text-[var(--color-neutral)] leading-snug">{val.desc}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="flex items-center gap-[var(--spacing-sm)] mt-[var(--spacing-md)] justify-start">
+                                <span className="font-label text-[0.6rem] tracking-[0.25em] text-[var(--color-muted)] uppercase font-semibold">
+                                    Scroll to explore
+                                </span>
+                                <ArrowRight size={14} className="text-[var(--color-accent)]" />
                             </div>
                         </div>
-                        <div className="group relative overflow-hidden rounded-2xl h-80 cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1596436889106-be35e843f974?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Boutique Flower Shop Kiosk Design" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
-                                <span className="text-amber-400 text-sm font-bold uppercase mb-2">Commercial</span>
-                                <h3 className="text-2xl font-bold text-white">Flower Shop Kiosk</h3>
-                            </div>
+
+                        {/* Right Side: Intricate CAD Architectural Wireframe SVG */}
+                        <div className="lg:col-span-4 hidden lg:flex justify-center items-center h-full pt-16">
+                            <svg 
+                                className="w-full h-auto max-w-[320px] opacity-[0.35] hover:opacity-75 transition-opacity duration-500" 
+                                viewBox="0 0 400 450" 
+                                fill="none" 
+                                xmlns="http://www.w3.org/2000/svg"
+                                aria-label="Interior space CAD wireframe drawing"
+                            >
+                                {/* Ground perspective plane */}
+                                <line x1="20" y1="400" x2="380" y2="400" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <line x1="20" y1="400" x2="150" y2="100" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <line x1="380" y1="400" x2="250" y2="100" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <line x1="150" y1="100" x2="250" y2="100" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                
+                                {/* Structural Pillars */}
+                                <rect x="50" y="150" width="20" height="250" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <rect x="330" y="150" width="20" height="250" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <rect x="140" y="100" width="10" height="300" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <rect x="250" y="100" width="10" height="300" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                
+                                {/* Ceiling grid lines */}
+                                <line x1="50" y1="150" x2="350" y2="150" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <line x1="50" y1="170" x2="350" y2="170" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <line x1="80" y1="150" x2="160" y2="100" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <line x1="320" y1="150" x2="240" y2="100" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                
+                                {/* Decorative floating elements - perspective grid */}
+                                <circle cx="200" cy="180" r="30" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" strokeDasharray="2,2" />
+                                <circle cx="200" cy="180" r="10" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <line x1="200" y1="100" x2="200" y2="170" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                
+                                {/* Floating interior CAD grids */}
+                                <path d="M 80,300 L 140,260 L 140,360 L 80,390 Z" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <path d="M 320,300 L 260,260 L 260,360 L 320,390 Z" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" />
+                                <path d="M 160,280 L 240,280 L 240,350 L 160,350 Z" stroke="#775a19" strokeWidth="0.5" className="cad-stroke" strokeDasharray="3,3" />
+                            </svg>
                         </div>
-                        <div className="group relative overflow-hidden rounded-2xl h-80 cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Modern Minimalist Living Space Interior" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
-                                <span className="text-amber-400 text-sm font-bold uppercase mb-2">Interior Fit-out</span>
-                                <h3 className="text-2xl font-bold text-white">Modern Living Space</h3>
-                            </div>
+                    </div>
+                </section>
+
+                {/* Projects Section: studied Asymmetric Grid */}
+                <section id="projects" className="max-w-[var(--spacing-container-max)] mx-auto px-6 md:px-20 py-[var(--spacing-2xl)] md:py-[var(--spacing-3xl)] border-b-[0.5px] border-[var(--color-rule)]">
+                    <div className="mb-[var(--spacing-xl)] text-left">
+                        <span className="font-label text-xs uppercase tracking-[var(--tracking-label)] text-[var(--color-accent)] block mb-[var(--spacing-xs)] font-semibold">
+                            Our Portfolio
+                        </span>
+                        <h2 className="text-display-s text-[var(--color-ink)]">
+                            Signature Projects
+                        </h2>
+                    </div>
+
+                    <div className="grid md:grid-cols-12 gap-8 items-start">
+                        {projectShowcase.map((proj, idx) => {
+                            const isFirst = idx === 0;
+                            const isSecond = idx === 1;
+                            const gridClass = isFirst 
+                                ? 'md:col-span-7 md:row-span-1' 
+                                : isSecond 
+                                    ? 'md:col-span-5 md:mt-16' 
+                                    : 'md:col-span-6 md:mt-8';
+                            return (
+                                <div key={idx} className={`flex flex-col text-left ${gridClass}`}>
+                                    <div className="hairline-img-container rounded-none">
+                                        <img 
+                                            src={proj.img} 
+                                            alt={proj.title} 
+                                            className="hairline-img h-[340px] md:h-[400px] w-full rounded-none"
+                                            loading="lazy"
+                                        />
+                                        <figcaption className="image-caption">{proj.caption}</figcaption>
+                                    </div>
+                                    <div className="mt-4 flex justify-between items-start px-1">
+                                        <div className="max-w-[85%]">
+                                            <span className="font-label text-[0.65rem] uppercase tracking-widest text-[var(--color-accent)] block mb-1 font-semibold">
+                                                {proj.type}
+                                            </span>
+                                            <h3 className="font-display text-xl text-[var(--color-ink)] mb-2">
+                                                {proj.title}
+                                            </h3>
+                                            <p className="text-xs text-[var(--color-neutral)] leading-relaxed mt-1">{proj.desc}</p>
+                                        </div>
+                                        <span className="font-display text-lg text-[var(--color-accent)] opacity-60 tabular-nums">{proj.num}</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </section>
+
+                {/* Materiality & Detail Section */}
+                <section id="materiality" className="max-w-[var(--spacing-container-max)] mx-auto px-6 md:px-20 py-[var(--spacing-2xl)] md:py-[var(--spacing-3xl)] border-b-[0.5px] border-[var(--color-rule)]">
+                    <div className="grid lg:grid-cols-12 gap-[var(--spacing-xl)] items-center">
+                        <div className="lg:col-span-7 text-left">
+                            <span className="font-label text-xs uppercase tracking-[var(--tracking-label)] text-[var(--color-accent)] block mb-[var(--spacing-xs)] font-semibold">
+                                Materiality & Detail
+                            </span>
+                            <h2 className="text-display-s mb-[var(--spacing-md)] text-[var(--color-ink)] leading-tight">
+                                Substance & Craftsmanship.
+                            </h2>
+                            <p className="text-base text-[var(--color-neutral)] leading-[var(--lh-relaxed)] mb-[var(--spacing-lg)] max-w-[52ch]">
+                                Our commitment to craftsmanship is absolute. We curate the world's finest materials—rare veined marbles, sustainably sourced hardwoods, and hand-patinated metals—orchestrating them with technical precision to create spaces of enduring substance.
+                            </p>
+                            <ul className="space-y-[var(--spacing-lg)]">
+                                <li className="flex gap-[var(--spacing-md)] border-b border-[var(--color-rule)] pb-4">
+                                    <span className="font-display text-2xl text-[var(--color-accent)] font-semibold">01</span>
+                                    <div>
+                                        <h4 className="font-label text-xs uppercase tracking-widest text-[var(--color-ink)] mb-1 font-semibold">Artisan Millwork</h4>
+                                        <p className="text-xs text-[var(--color-neutral)] leading-relaxed">Precision-engineered timber detailing, emphasizing natural grain and textural warmth.</p>
+                                    </div>
+                                </li>
+                                <li className="flex gap-[var(--spacing-md)] border-b border-[var(--color-rule)] pb-4">
+                                    <span className="font-display text-2xl text-[var(--color-accent)] font-semibold">02</span>
+                                    <div>
+                                        <h4 className="font-label text-xs uppercase tracking-widest text-[var(--color-ink)] mb-1 font-semibold">Stone Selection</h4>
+                                        <p className="text-xs text-[var(--color-neutral)] leading-relaxed">Book-matched marble installations, executing complex architectural geometries.</p>
+                                    </div>
+                                </li>
+                                <li className="flex gap-[var(--spacing-md)] pb-4">
+                                    <span className="font-display text-2xl text-[var(--color-accent)] font-semibold">03</span>
+                                    <div>
+                                        <h4 className="font-label text-xs uppercase tracking-widest text-[var(--color-ink)] mb-1 font-semibold">Bespoke Metals</h4>
+                                        <p className="text-xs text-[var(--color-neutral)] leading-relaxed">Custom brass and bronze fabrications with meticulously applied patinas.</p>
+                                    </div>
+                                </li>
+                            </ul>
                         </div>
-                        <div className="group relative overflow-hidden rounded-2xl h-80 cursor-pointer">
-                            <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Professional HVAC Installation and Maintenance" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
-                                <span className="text-amber-400 text-sm font-bold uppercase mb-2">Technical Services</span>
-                                <h3 className="text-2xl font-bold text-white">Office HVAC Installation</h3>
+                        
+                        <div className="lg:col-span-5 relative flex justify-center">
+                            <div className="hairline-img-container max-w-[340px] rounded-none">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1631679706909-1844bbd07221?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                                    alt="Luxury interior materials detail" 
+                                    className="hairline-img h-[400px] w-full rounded-none"
+                                    loading="lazy"
+                                />
+                                <figcaption className="image-caption">[06 — Material samples & high-contrast textures]</figcaption>
+                            </div>
+                            
+                            {/* Decorative sample card */}
+                            <div className="absolute -bottom-6 -left-6 bg-white p-5 border border-[var(--color-rule)] shadow-xl hidden sm:block w-56 text-left rounded-none">
+                                <div className="h-24 bg-gradient-to-br from-amber-600/20 to-amber-900/10 mb-3 border border-gold/40"></div>
+                                <div className="font-label text-[0.65rem] uppercase tracking-widest text-[var(--color-ink)] mb-1 font-semibold">Brushed Brass</div>
+                                <div className="text-[9px] font-label text-[var(--color-muted)] uppercase tracking-wider font-semibold">Bespoke Hardware Finish</div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            {/* Contact Section */}
-            <section id="contact" className="py-24 bg-slate-900 text-white relative">
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-900 via-amber-500 to-blue-900"></div>
-                <div className="container mx-auto px-6">
-                    <div className="grid lg:grid-cols-2 gap-16">
-                        <div>
-                            <span className="text-amber-500 font-bold uppercase tracking-wider text-sm mb-2 block">Get In Touch</span>
-                            <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Space?</h2>
-                            <p className="text-slate-400 mb-10 text-lg">
-                                Contact us today for a quote! Our team is ready to provide quality craftsmanship and exceptional service for your next project.
+                {/* About / Philosophy Section: studied Asymmetry layout */}
+                <section id="about" className="max-w-[var(--spacing-container-max)] mx-auto px-6 md:px-20 py-[var(--spacing-2xl)] md:py-[var(--spacing-3xl)] border-b-[0.5px] border-[var(--color-rule)]">
+                    <div className="grid lg:grid-cols-12 gap-[var(--spacing-xl)] items-center mb-[var(--spacing-2xl)]">
+                        <div className="lg:col-span-7 text-left">
+                            <span className="font-label text-xs uppercase tracking-[var(--tracking-label)] text-[var(--color-accent)] block mb-[var(--spacing-xs)] font-semibold">
+                                The Studio
+                            </span>
+                            <h2 className="text-display-s mb-[var(--spacing-md)] text-[var(--color-ink)]">
+                                Crafting Spaces That Inspire.
+                            </h2>
+                            <p className="text-base text-[var(--color-neutral)] leading-[var(--lh-relaxed)] max-w-[50ch] mb-[var(--spacing-md)]">
+                                Zinat Al Ruh Technical Services LLC stands for meticulous, premium fit-out contracting in the heart of Dubai. We operate our technical workflows with absolute engineering precision and visual restraint.
                             </p>
-                            
-                            <div className="space-y-6">
-                                <div className="flex items-start gap-4">
-                                    <div className="bg-blue-800 p-3 rounded-lg text-amber-400">
-                                        <MapPin />
+                            <p className="text-base text-[var(--color-neutral)] leading-[var(--lh-relaxed)] max-w-[50ch]">
+                                By avoiding generic visual elements and relying on durable, premium materials, we coordinate and supervise your interior layouts to deliver bespoke spaces of quiet luxury.
+                            </p>
+                        </div>
+                        
+                        <div className="lg:col-span-5 flex justify-center lg:justify-end">
+                            <div className="hairline-img-container max-w-[380px] rounded-none">
+                                <img 
+                                    src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                                    alt="Luxury carpentry and materials" 
+                                    className="hairline-img h-[340px] w-full rounded-none"
+                                />
+                                <figcaption className="image-caption">[02 — Architectural detail & marble surfaces]</figcaption>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Asymmetric Core Values & Bespoke Quote */}
+                    <div className="grid lg:grid-cols-12 gap-[var(--spacing-xl)] items-center">
+                        <div className="lg:col-span-6 lg:order-2 text-left">
+                            <div className="border-l border-[var(--color-accent)] pl-[var(--spacing-md)] py-4">
+                                <span className="font-label text-[0.6rem] tracking-[0.25em] text-[var(--color-accent)] uppercase block mb-2 font-semibold">PRECISION & QUALITY</span>
+                                <h3 className="font-serif italic text-2xl md:text-3xl text-[var(--color-ink)] leading-[var(--lh-snug)] font-light">
+                                    "We believe that quality is not an accident. It is the result of continuous attention, refined materials, and expert hands."
+                                </h3>
+                                <span className="font-label text-xs uppercase tracking-[var(--tracking-label)] text-[var(--color-neutral)] mt-[var(--spacing-sm)] block font-semibold">
+                                    — Zinat Al Ruh Atelier
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="lg:col-span-6 lg:order-1 text-left">
+                            <span className="font-label text-xs uppercase tracking-[var(--tracking-label)] text-[var(--color-muted)] block mb-[var(--spacing-md)] font-semibold">
+                                CORE OPERATIONAL VALUES
+                            </span>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-[var(--spacing-md)]">
+                                {[
+                                    { title: 'Quality', desc: 'Excellence in structural details' },
+                                    { title: 'Integrity', desc: 'Absolute pricing transparency' },
+                                    { title: 'Reliability', desc: 'Timelines consistently respected' },
+                                    { title: 'Innovation', desc: 'Modern construction systems' }
+                                ].map((val, idx) => (
+                                    <div key={idx} className="border-t border-[var(--color-rule)] pt-4">
+                                        <h4 className="font-label text-[0.75rem] font-bold uppercase tracking-widest text-[var(--color-ink)] mb-1">{val.title}</h4>
+                                        <p className="text-xs text-[var(--color-neutral)] leading-[var(--lh-normal)]">{val.desc}</p>
                                     </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* Contact Form Section: Glassmorphic block split */}
+                <section id="contact" className="max-w-[var(--spacing-container-max)] mx-auto px-6 md:px-20 py-[var(--spacing-2xl)] md:py-[var(--spacing-3xl)]">
+                    <div className="grid lg:grid-cols-12 gap-[var(--spacing-xl)] items-start">
+                        
+                        {/* Left Side: Contact Information */}
+                        <div className="lg:col-span-5 text-left">
+                            <span className="font-label text-xs uppercase tracking-[var(--tracking-label)] text-[var(--color-accent)] block mb-[var(--spacing-xs)] font-semibold">
+                                Get in touch
+                            </span>
+                            <h2 className="text-display-s mb-[var(--spacing-md)] text-[var(--color-ink)]">
+                                Ready to Begin?
+                            </h2>
+                            <p className="text-base text-[var(--color-neutral)] leading-[var(--lh-relaxed)] mb-[var(--spacing-lg)]">
+                                Reach out today to review layout coordinates, architectural blueprints, or technical specifications. Our engineers will arrange a site audit and present a detailed estimate.
+                            </p>
+
+                            <div className="space-y-[var(--spacing-sm)] border-t border-[var(--color-rule)] pt-6">
+                                <div className="flex gap-4">
+                                    <MapPin size={16} className="text-[var(--color-accent)] shrink-0 mt-1" />
                                     <div>
-                                        <h4 className="font-bold text-lg">Location</h4>
-                                        <p className="text-slate-300">9 Deira, Dubai, UAE</p>
+                                        <h4 className="font-label text-[0.65rem] uppercase tracking-[var(--tracking-label)] text-[var(--color-muted)] font-semibold">Location</h4>
+                                        <p className="text-sm font-medium text-[var(--color-ink)]">9 Deira, Dubai, United Arab Emirates</p>
                                     </div>
                                 </div>
-                                <div className="flex items-start gap-4">
-                                    <div className="bg-blue-800 p-3 rounded-lg text-amber-400">
-                                        <Phone />
-                                    </div>
+                                <div className="flex gap-4">
+                                    <Phone size={16} className="text-[var(--color-accent)] shrink-0 mt-1" />
                                     <div>
-                                        <h4 className="font-bold text-lg">Phone</h4>
-                                        <p className="text-slate-300">+971 58 525 8199</p>
+                                        <h4 className="font-label text-[0.65rem] uppercase tracking-[var(--tracking-label)] text-[var(--color-muted)] font-semibold">Direct Phone</h4>
+                                        <p className="text-sm font-medium text-[var(--color-ink)]">+971 58 525 8199</p>
                                     </div>
                                 </div>
-                                <div className="flex items-start gap-4">
-                                    <div className="bg-blue-800 p-3 rounded-lg text-amber-400">
-                                        <Mail />
-                                    </div>
+                                <div className="flex gap-4">
+                                    <Mail size={16} className="text-[var(--color-accent)] shrink-0 mt-1" />
                                     <div>
-                                        <h4 className="font-bold text-lg">Email</h4>
-                                        <p className="text-slate-300">sales@zinatalruh.com</p>
+                                        <h4 className="font-label text-[0.65rem] uppercase tracking-[var(--tracking-label)] text-[var(--color-muted)] font-semibold">Email</h4>
+                                        <p className="text-sm font-medium text-[var(--color-ink)]">sales@zinatalruh.com</p>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="mt-8 pt-8 border-t border-slate-800">
-                                <h4 className="font-bold text-lg mb-4">Follow Us</h4>
-                                <div className="flex gap-4">
-                                    <a href="https://www.linkedin.com/company/zinatalruh" target="_blank" rel="noopener noreferrer" className="bg-blue-800 p-3 rounded-lg text-amber-400 hover:bg-amber-500 hover:text-white transition-colors">
-                                        <Linkedin />
+                            <div className="mt-8 pt-4 border-t border-[var(--color-rule)] flex items-center gap-[var(--spacing-sm)]">
+                                <span className="font-label text-[0.65rem] uppercase tracking-[var(--tracking-label)] text-[var(--color-muted)] font-semibold">Channels</span>
+                                <div className="flex gap-2">
+                                    <a href="https://www.linkedin.com/company/zinatalruh" target="_blank" rel="noopener noreferrer" className="p-2 border border-[var(--color-rule)] text-[var(--color-neutral)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] transition-all rounded-none">
+                                        <Linkedin size={14} />
                                     </a>
-                                    <a href="https://www.instagram.com/zinat_alruh/" target="_blank" rel="noopener noreferrer" className="bg-blue-800 p-3 rounded-lg text-amber-400 hover:bg-amber-500 hover:text-white transition-colors">
-                                        <Instagram />
+                                    <a href="https://www.instagram.com/zinat_alruh/" target="_blank" rel="noopener noreferrer" className="p-2 border border-[var(--color-rule)] text-[var(--color-neutral)] hover:text-[var(--color-accent)] hover:border-[var(--color-accent)] transition-all rounded-none">
+                                        <Instagram size={14} />
                                     </a>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white p-8 rounded-2xl shadow-2xl text-slate-900">
-                            <h3 className="text-2xl font-bold mb-6 text-blue-900">Request a Quote</h3>
-                            <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-                                <div className="grid md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-                                        <input type="text" className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none" placeholder="Your Name" />
+                        {/* Right Side: Premium Glassmorphic 8-State Styled Contact Form */}
+                        <div className="lg:col-span-7 bg-[var(--color-paper-2)] p-8 border border-[var(--color-rule)] rounded-none">
+                            <h3 className="font-display text-2xl mb-[var(--spacing-md)] text-[var(--color-ink)] text-left font-normal">
+                                Request a Quote
+                            </h3>
+
+                            <form onSubmit={handleSubmit} className="space-y-[var(--spacing-sm)]" noValidate>
+                                <div className="grid md:grid-cols-2 gap-[var(--spacing-sm)]">
+                                    <div className="text-left">
+                                        <label className="block font-label text-[0.65rem] uppercase tracking-[var(--tracking-label)] text-[var(--color-neutral)] mb-1 font-semibold">
+                                            Name <span className="text-[var(--color-accent)]">*</span>
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            name="name"
+                                            value={formValues.name}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            disabled={formStatus === 'loading' || formStatus === 'success'}
+                                            className={`w-full h-11 px-0 atelier-input rounded-none ${errors.name && touched.name ? 'border-red-500' : ''}`}
+                                            placeholder="Maya Okonkwo"
+                                            required
+                                        />
+                                        <div className="min-h-[1.25rem] mt-1">
+                                            {errors.name && touched.name && (
+                                                <span className="text-xs text-red-600 flex items-center gap-1">
+                                                    <AlertCircle size={12} /> {errors.name}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
-                                        <input type="tel" className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none" placeholder="+971..." />
+
+                                    <div className="text-left">
+                                        <label className="block font-label text-[0.65rem] uppercase tracking-[var(--tracking-label)] text-[var(--color-neutral)] mb-1 font-semibold">
+                                            Phone
+                                        </label>
+                                        <input 
+                                            type="tel" 
+                                            name="phone"
+                                            value={formValues.phone}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            disabled={formStatus === 'loading' || formStatus === 'success'}
+                                            className="w-full h-11 px-0 atelier-input rounded-none"
+                                            placeholder="+971 50 123 4567"
+                                        />
+                                        <div className="min-h-[1.25rem] mt-1"></div>
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
-                                    <input type="email" className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none" placeholder="your@email.com" />
+
+                                <div className="text-left">
+                                    <label className="block font-label text-[0.65rem] uppercase tracking-[var(--tracking-label)] text-[var(--color-neutral)] mb-1 font-semibold">
+                                        Email Address <span className="text-[var(--color-accent)]">*</span>
+                                    </label>
+                                    <input 
+                                        type="email" 
+                                        name="email"
+                                        value={formValues.email}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        disabled={formStatus === 'loading' || formStatus === 'success'}
+                                        className={`w-full h-11 px-0 atelier-input rounded-none ${errors.email && touched.email ? 'border-red-500' : ''}`}
+                                        placeholder="maya@example.com"
+                                        required
+                                    />
+                                    <div className="min-h-[1.25rem] mt-1">
+                                        {errors.email && touched.email && (
+                                            <span className="text-xs text-red-600 flex items-center gap-1">
+                                                <AlertCircle size={12} /> {errors.email}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Service Interested</label>
-                                    <select className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none">
-                                        <option>Interior Design</option>
-                                        <option>Construction / Tiling</option>
-                                        <option>HVAC / AC Services</option>
-                                        <option>Electrical / Plumbing</option>
-                                        <option>Building Cleaning</option>
-                                        <option>Other</option>
+
+                                <div className="text-left">
+                                    <label className="block font-label text-[0.65rem] uppercase tracking-[var(--tracking-label)] text-[var(--color-neutral)] mb-1 font-semibold">
+                                        Service Required
+                                    </label>
+                                    <select 
+                                        name="service"
+                                        value={formValues.service}
+                                        onChange={handleChange}
+                                        disabled={formStatus === 'loading' || formStatus === 'success'}
+                                        className="w-full h-11 px-0 atelier-input rounded-none cursor-pointer bg-white"
+                                    >
+                                        <option value="Interior Design">Interior Design & Fit-out</option>
+                                        <option value="Tiling">Floor & Wall Tiling</option>
+                                        <option value="Plaster Works">Plastering & Gypsum Works</option>
+                                        <option value="Technical Services">Electrical / Plumbing / HVAC</option>
+                                        <option value="Maintenance">Annual Maintenance Contract</option>
+                                        <option value="Other">Other Specialized Service</option>
                                     </select>
+                                    <div className="min-h-[1.25rem] mt-1"></div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Message</label>
-                                    <textarea className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-amber-500 focus:ring-1 focus:ring-amber-500 outline-none h-32" placeholder="Tell us about your project requirements..."></textarea>
+
+                                <div className="text-left">
+                                    <label className="block font-label text-[0.65rem] uppercase tracking-[var(--tracking-label)] text-[var(--color-neutral)] mb-1 font-semibold">
+                                        Project Description <span className="text-[var(--color-accent)]">*</span>
+                                    </label>
+                                    <textarea 
+                                        name="message"
+                                        value={formValues.message}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        disabled={formStatus === 'loading' || formStatus === 'success'}
+                                        className={`w-full h-28 p-0 pt-2 atelier-input rounded-none resize-y ${errors.message && touched.message ? 'border-red-500' : ''}`}
+                                        placeholder="Outline your sizing, spacing, and technical fit-out requirements..."
+                                        required
+                                    ></textarea>
+                                    <div className="min-h-[1.25rem] mt-1">
+                                        {errors.message && touched.message && (
+                                            <span className="text-xs text-red-600 flex items-center gap-1">
+                                                <AlertCircle size={12} /> {errors.message}
+                                            </span>
+                                        )}
+                                    </div>
                                 </div>
-                                <Button variant="primary" className="w-full">Send Message</Button>
+
+                                <button 
+                                    type="submit"
+                                    disabled={formStatus === 'loading' || formStatus === 'success'}
+                                    className="w-full h-11 bg-[var(--color-ink)] text-white font-label text-xs uppercase tracking-[var(--tracking-label)] flex items-center justify-center gap-2 transition-all hover:bg-[var(--color-ink)]/90 disabled:opacity-50 disabled:cursor-not-allowed rounded-none font-semibold cursor-pointer"
+                                >
+                                    {formStatus === 'idle' && (
+                                        <>
+                                            Submit Request <ArrowRight size={14} />
+                                        </>
+                                    )}
+                                    {formStatus === 'loading' && (
+                                        <>
+                                            <Loader2 size={14} className="animate-spin" /> Transmitting...
+                                        </>
+                                    )}
+                                    {formStatus === 'success' && (
+                                        <>
+                                            <Check size={14} /> Transmitted Successfully
+                                        </>
+                                    )}
+                                </button>
                             </form>
                         </div>
-                    </div>
-                </div>
-            </section>
 
-            {/* Footer */}
-            <footer className="bg-slate-950 text-slate-400 py-12 border-t border-slate-800">
-                <div className="container mx-auto px-6">
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex items-center gap-4">
-                            <img 
-                                src="Zinat Al RuhFinal Logo Updated Version-02.jpg" 
-                                alt="Zinat Al Ruh" 
-                                className="h-14 w-auto opacity-80"
-                                onError={(e) => {
-                                    // Fallback if image fails to load
-                                    e.target.style.display = 'none';
-                                    if(e.target.nextSibling) {
-                                        e.target.nextSibling.classList.remove('hidden');
-                                        e.target.nextSibling.style.display = 'block';
-                                    }
-                                }}
-                            />
-                            {/* Fallback Text for Footer */}
-                            <div className="hidden">
-                                <h2 className="text-2xl font-bold text-white mb-1">ZINAT AL RUH</h2>
-                                <p className="text-sm">Technical Services LLC</p>
-                            </div>
+                    </div>
+                </section>
+            </main>
+
+            {/* Footer Archetype: Ft6 (Letter Close) studied variant */}
+            <footer className="w-full bg-[var(--color-paper)] border-t-[0.5px] border-[var(--color-rule)] py-[var(--spacing-xl)]">
+                <div className="max-w-[var(--spacing-container-max)] mx-auto px-6 md:px-20">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-[var(--spacing-lg)]">
+                        <div className="flex flex-col text-left">
+                            <span className="font-serif italic text-lg text-[var(--color-neutral)] mb-1">
+                                Yours,
+                            </span>
+                            <span className="font-display text-xl tracking-[var(--tracking-label)] uppercase text-[var(--color-ink)]">
+                                ZINAT AL RUH.
+                            </span>
+                            <span className="font-label text-[0.6rem] uppercase tracking-wider text-[var(--color-muted)] mt-2 font-semibold">
+                                Dubai, United Arab Emirates · Licence 1032890
+                            </span>
                         </div>
-                        <div className="flex gap-8 text-sm">
-                            <button onClick={() => scrollToSection('hero')} className="hover:text-amber-500 transition-colors">Home</button>
-                            <button onClick={() => scrollToSection('services')} className="hover:text-amber-500 transition-colors">Services</button>
-                            <button onClick={() => scrollToSection('projects')} className="hover:text-amber-500 transition-colors">Projects</button>
-                            <button onClick={() => scrollToSection('contact')} className="hover:text-amber-500 transition-colors">Contact</button>
+
+                        <div className="flex flex-wrap gap-[var(--spacing-md)] text-xs font-label uppercase tracking-widest text-[var(--color-muted)] font-semibold">
+                            <button onClick={() => scrollToSection('hero')} className="hover:text-[var(--color-accent)] transition-colors">Home</button>
+                            <button onClick={() => scrollToSection('services')} className="hover:text-[var(--color-accent)] transition-colors">Services</button>
+                            <button onClick={() => scrollToSection('projects')} className="hover:text-[var(--color-accent)] transition-colors">Projects</button>
+                            <button onClick={() => scrollToSection('materiality')} className="hover:text-[var(--color-accent)] transition-colors">Materiality</button>
+                            <button onClick={() => scrollToSection('about')} className="hover:text-[var(--color-accent)] transition-colors">Philosophy</button>
                         </div>
-                        <p className="text-sm">© {new Date().getFullYear()} Zinat Al Ruh. All rights reserved.</p>
+                    </div>
+
+                    <div className="mt-[var(--spacing-xl)] pt-[var(--spacing-md)] border-t-[0.5px] border-[var(--color-rule)] flex flex-col md:flex-row justify-between items-center text-[0.65rem] font-label text-[var(--color-muted)] gap-4">
+                        <p>© {new Date().getFullYear()} ZINAT AL RUH TECHNICAL SERVICES LLC. HANDCRAFTED IN DUBAI.</p>
+                        <p className="uppercase tracking-[var(--tracking-label)]">Architectural Precision.</p>
                     </div>
                 </div>
             </footer>
