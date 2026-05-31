@@ -1,16 +1,56 @@
-# React + Vite
+# Zinat Al Ruh — Next.js + React Three Fiber
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Cinematic 3D-scroll port of the Zinat Al Ruh Technical Services site (Dubai interior fit-out),
+built from the original design brief: **Next.js (App Router) · React Three Fiber · Three.js ·
+GSAP ScrollTrigger · Lenis · Tailwind · Framer Motion**.
 
-Currently, two official plugins are available:
+The static HTML/CSS/JS prototype it was ported from lives in `../zinatalruh-website/` (reference).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Run
 
-## React Compiler
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # production build
+npm start
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## How it works
 
-## Expanding the ESLint configuration
+- **3D layer** (`components/three/`): a fixed full-viewport `<Canvas>` (client-only via
+  `next/dynamic`, `ssr:false`) sits behind the DOM. `CameraRig` flies the camera down a
+  procedural luxury corridor (`InteriorSpace`) as you scroll, with mouse parallax. The bundle's
+  photos hang as framed planes (`GalleryPlanes`); six service cards float in a slow ring
+  (`ServiceCards`). `Lights` provides the gold/champagne mood. The accent colour follows the
+  live `--gold-bright` CSS var, so the Tweaks panel recolours the 3D scene too.
+- **Scroll** (`components/ScrollProvider.tsx`): Lenis smooth scroll wired to GSAP ScrollTrigger,
+  publishing a normalized `0..1` progress ref the camera reads each frame; also drives the top
+  progress bar.
+- **Reveals** (`components/Reveal.tsx`): Framer Motion reproductions of the prototype's masked
+  line slide-up, translate-fade, and blur-in patterns.
+- **Fallback** (`components/SceneMount.tsx`): on mobile (<768px), `prefers-reduced-motion`, or
+  when WebGL is unavailable, the Canvas is skipped and the ported CSS ambient background
+  (`components/Ambient.tsx`) carries the mood. The page stays fully functional.
+- **Content**: all copy, sections, SEO metadata, JSON-LD, the WhatsApp CTA payload, the enquiry
+  form, and the Tweaks panel (accent / atmosphere / finish, persisted to `localStorage`) are
+  ported verbatim from the prototype.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Project map
+
+```
+app/
+  layout.tsx     SEO metadata + GeneralContractor JSON-LD; next/font (Bodoni Moda + Manrope)
+  page.tsx       composes the scene + all sections
+  globals.css    design tokens + every component style (font literals → next/font vars)
+lib/data.ts      typed SERVICES, ICONS, SITE/DESIGN slides, ACCENTS/ATMOS/FINISH
+components/      ScrollProvider, Reveal, Loader, Nav, Hero, Services, Gallery, Divisions,
+                 About, Enquiry, Contact, TweaksPanel, Ambient, SceneMount
+components/three/ Scene, CameraRig, InteriorSpace, GalleryPlanes, ServiceCards, Lights
+public/assets/   logo, hero video, design/ + site/ photos, team photo
+```
+
+## Notes
+
+- Bodoni Moda's lightest hosted weight is 400; the design's `font-weight:300` falls back to it.
+  Next prints a harmless "Failed to find font override values for font Bodoni Moda" line at
+  build/dev — it only means no layout-shift metrics are bundled, not an error.

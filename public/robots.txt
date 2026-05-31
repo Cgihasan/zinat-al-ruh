@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://zinat-al-ruh.vercel.app/sitemap.xml
