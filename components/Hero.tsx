@@ -24,26 +24,14 @@ export default function Hero({ play }: { play: boolean }) {
 
   return (
     <section id="hero" className="section section-hero relative overflow-hidden" data-section="hero">
-      <video
-        className="hero-video"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        poster="/assets/design/04-formal-living.jpg"
-      >
+      <video className="hero-video" autoPlay muted loop playsInline preload="auto">
         <source src="/assets/hero-video.mp4" type="video/mp4" />
       </video>
       <div className="hero-overlay" />
 
       <div className="max-w-[1600px] w-full mx-auto hero-content">
         <div className="max-w-[860px]">
-          <motion.div className="eyebrow" {...blur(0.3)}>
-            COLLECTION &apos;26 · DEIRA, DUBAI
-          </motion.div>
-
-          <h1 className="hero-title mt-7">
+          <h1 className="hero-title">
             <RevealLine immediate={play} delay={0.1}>Design.</RevealLine>{' '}
             <RevealLine immediate={play} delay={0.2}>Build.</RevealLine>
             <br />
