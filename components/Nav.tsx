@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import { NAV_LINKS } from '@/lib/data';
 import { useScroll } from './ScrollProvider';
 
@@ -41,10 +42,12 @@ export default function Nav() {
     <>
       <nav className={`nav${scrolled ? ' scrolled' : ''}`}>
         <a href="#hero" className="logo-mark" onClick={(e) => go(e, '#hero')}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src="/assets/logo-color.png"
             alt="Zinat Al Ruh Technical Services LLC — Premium Interior Fit-Out Dubai"
+            width={51}
+            height={72}
+            priority
           />
           <span className="logo-name">
             <span className="ln-1">ZINAT AL RUH</span>

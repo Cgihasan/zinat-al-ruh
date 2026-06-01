@@ -45,7 +45,7 @@ export default function Services() {
     <section id="services" className="section" data-section="services">
       <div className="max-w-[1500px] w-full mx-auto">
         <div className="sec-head max-w-[920px]">
-          <Reveal className="eyebrow">OUR SERVICES</Reveal>
+          <Reveal as="h2" className="eyebrow">OUR SERVICES</Reveal>
           <Reveal as="p" className="sec-lead mt-7 max-w-2xl" delay={0.08}>
             Zinat Al Ruh brings design understanding, technical coordination and site execution
             together — delivering residential, commercial, retail and hospitality interiors with
@@ -60,7 +60,7 @@ export default function Services() {
               <div className="num">{s.num}</div>
               <div className="icon" dangerouslySetInnerHTML={{ __html: ICONS[s.icon] }} />
               <div className="svc-foot">
-                <div className="title">{s.name}</div>
+                <h3 className="title">{s.name}</h3>
                 <div className="underline" />
                 <div className="svc-desc">{s.desc}</div>
               </div>

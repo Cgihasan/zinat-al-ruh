@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { Reveal } from './Reveal';
 import StatCounter from './StatCounter';
 
@@ -8,7 +9,7 @@ export default function About() {
     <section id="about" className="section" data-section="about">
       <div className="max-w-[1500px] w-full mx-auto">
         <div className="about-frame">
-          <Reveal className="eyebrow">ABOUT ZINAT AL RUH</Reveal>
+          <Reveal as="h2" className="eyebrow">ABOUT ZINAT AL RUH</Reveal>
 
           <div className="about-cols about-cols-top">
             <div className="about-intro-col">
@@ -82,15 +83,17 @@ export default function About() {
           </div>
 
           <Reveal className="team-block">
-            <div className="eyebrow" style={{ marginBottom: 18 }}>
+            <h3 className="eyebrow" style={{ marginBottom: 18 }}>
               OUR TEAM
-            </div>
+            </h3>
             <article className="team-card team-card-wide">
               <div className="team-photo">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src="/assets/team/ameer-ali.png"
                   alt="Ameer Ali, Operations Manager at Zinat Al Ruh Technical Services"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 320px"
+                  style={{ objectFit: 'cover' }}
                 />
               </div>
               <div className="team-info">

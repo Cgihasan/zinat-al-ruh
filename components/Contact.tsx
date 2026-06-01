@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { Reveal } from './Reveal';
 import { WHATSAPP_HREF } from '@/lib/data';
 
@@ -57,9 +58,9 @@ export default function Contact() {
             <div className="div-tag">
               <span className="dot" /> SAY HELLO
             </div>
-            <h3 className="font-display mt-7 text-[clamp(34px,4.2vw,58px)] leading-[1.05] font-light max-w-md">
+            <h2 className="font-display mt-7 text-[clamp(34px,4.2vw,58px)] leading-[1.05] font-light max-w-md">
               A complimentary site visit, anywhere in the <em className="text-[var(--gold-warm)]">UAE.</em>
-            </h3>
+            </h2>
             <p className="mt-7 text-[14px] leading-[1.85] text-[var(--ink-dim)] max-w-md">
               Share a few details about your project — we&apos;ll arrange an on-site assessment,
               prepare an indicative budget, and guide you with a clear delivery plan. No obligation.
@@ -128,10 +129,9 @@ export default function Contact() {
           </Reveal>
         </div>
 
-        <div className="footer-bar">
+        <footer className="footer-bar">
           <div className="flex items-center gap-4">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/assets/logo-color.png" alt="" style={{ height: 48, width: 'auto' }} />
+            <Image src="/assets/logo-color.png" alt="" width={34} height={48} style={{ height: 48, width: 'auto' }} />
             <div className="leading-tight">
               <div className="text-[var(--ink)] font-display tracking-[0.18em] text-[14px]">
                 ZINAT AL RUH
@@ -173,7 +173,7 @@ export default function Contact() {
               LinkedIn
             </a>
           </div>
-        </div>
+        </footer>
       </div>
     </section>
   );

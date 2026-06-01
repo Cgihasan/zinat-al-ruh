@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import Image from 'next/image';
 import type { Slide } from '@/lib/data';
 
 interface GalleryProps {
@@ -77,8 +78,14 @@ export default function Gallery({ slides, autoAdvanceMs, defaultMeta, defaultLab
               className={`slide${pos === null ? ' is-hidden' : ''}`}
               data-pos={pos === null ? undefined : pos}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={s.src} alt={s.label} loading={i < 3 ? 'eager' : 'lazy'} />
+              <Image
+                src={s.src}
+                alt={s.label}
+                fill
+                sizes="(max-width: 768px) 90vw, 60vw"
+                loading={i < 3 ? 'eager' : 'lazy'}
+                style={{ objectFit: 'cover' }}
+              />
             </div>
           );
         })}
@@ -108,8 +115,7 @@ export default function Gallery({ slides, autoAdvanceMs, defaultMeta, defaultLab
                 go(i);
               }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={s.src} alt="" loading="lazy" />
+              <Image src={s.src} alt="" fill sizes="78px" loading="lazy" style={{ objectFit: 'cover' }} />
             </div>
           ))}
         </div>

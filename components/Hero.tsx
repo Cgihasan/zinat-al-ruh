@@ -24,7 +24,15 @@ export default function Hero({ play }: { play: boolean }) {
 
   return (
     <section id="hero" className="section section-hero relative overflow-hidden" data-section="hero">
-      <video className="hero-video" autoPlay muted loop playsInline preload="auto">
+      <video
+        className="hero-video"
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        poster="/assets/design/04-formal-living.jpg"
+      >
         <source src="/assets/hero-video.mp4" type="video/mp4" />
       </video>
       <div className="hero-overlay" />
@@ -41,6 +49,7 @@ export default function Hero({ play }: { play: boolean }) {
             <br />
             <RevealLine immediate={play} delay={0.3}>Supervise.</RevealLine>{' '}
             <RevealLine immediate={play} delay={0.4} className="gold">Deliver.</RevealLine>
+            <span className="sr-only"> — Premium Interior Fit-Out in Dubai, UAE</span>
           </h1>
 
           <motion.div className="gold-line mt-8" {...blur(0.5)} />

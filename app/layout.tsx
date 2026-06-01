@@ -28,7 +28,8 @@ export const metadata: Metadata = {
   authors: [{ name: 'Zinat Al Ruh Technical Services LLC' }],
   robots: { index: true, follow: true, 'max-image-preview': 'large' },
   alternates: { canonical: 'https://zinatalruh.com/' },
-  icons: { icon: '/assets/logo-color.png', apple: '/assets/logo-color.png' },
+  // Favicon + apple-touch icons are provided by the app/icon.png and
+  // app/apple-icon.png file conventions (auto-wired by Next.js).
   openGraph: {
     type: 'website',
     locale: 'en_AE',
@@ -37,13 +38,20 @@ export const metadata: Metadata = {
     description:
       'Design. Build. Supervise. Deliver. Turnkey interior fit-out, design consultancy and site supervision across the UAE.',
     url: 'https://zinatalruh.com/',
-    images: ['/assets/design/04-formal-living.jpg'],
+    images: [
+      {
+        url: 'https://zinatalruh.com/assets/og.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Zinat Al Ruh — Premium Interior Fit-Out, Dubai',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Zinat Al Ruh — Premium Interior Fit-Out, Dubai UAE',
     description: 'Design. Build. Supervise. Deliver.',
-    images: ['/assets/design/04-formal-living.jpg'],
+    images: ['https://zinatalruh.com/assets/og.jpg'],
   },
 };
 
