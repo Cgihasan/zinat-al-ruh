@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, type Variants } from 'framer-motion';
-import type { ReactNode, ElementType } from 'react';
+import { useMemo, type ReactNode, type ElementType } from 'react';
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -35,7 +35,16 @@ export function Reveal({
   delay = 0,
   immediate = false,
 }: RevealProps) {
-  const MotionTag = motion(as as ElementType) as ElementType;
+  // For string tags use the cached `motion.<tag>` proxy; for component types use
+  // `motion.create()`. Memoised so we don't recreate the component each render
+  // (which would remount the subtree). Replaces the deprecated `motion(as)` factory.
+  const MotionTag = useMemo<ElementType>(
+    () =>
+      typeof as === 'string'
+        ? ((motion as unknown as Record<string, ElementType>)[as] ?? motion.create(as))
+        : motion.create(as),
+    [as]
+  );
   const variants = variant === 'blur' ? blurVariants : revealVariants;
   const animateProps = immediate
     ? { animate: 'show' as const }

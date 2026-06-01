@@ -1,6 +1,7 @@
 'use client';
 
 import { Reveal } from './Reveal';
+import StatCounter from './StatCounter';
 
 export default function About() {
   return (
@@ -27,20 +28,24 @@ export default function About() {
               <div className="stats-inline">
                 <Reveal>
                   <div className="stat-num">
-                    100<span className="text-[var(--gold)]">%</span>
+                    <StatCounter value={100} suffix="%" />
                   </div>
                   <div className="mt-2 text-[10px] tracking-[0.28em] text-[var(--ink-mute)] uppercase">
                     In-House Coordination
                   </div>
                 </Reveal>
                 <Reveal delay={0.05}>
-                  <div className="stat-num">7</div>
+                  <div className="stat-num">
+                    <StatCounter value={7} />
+                  </div>
                   <div className="mt-2 text-[10px] tracking-[0.28em] text-[var(--ink-mute)] uppercase">
                     Emirates Served
                   </div>
                 </Reveal>
                 <Reveal delay={0.1}>
-                  <div className="stat-num">4</div>
+                  <div className="stat-num">
+                    <StatCounter value={4} />
+                  </div>
                   <div className="mt-2 text-[10px] tracking-[0.28em] text-[var(--ink-mute)] uppercase">
                     Sectors Covered
                   </div>

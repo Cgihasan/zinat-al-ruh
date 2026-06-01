@@ -24,7 +24,11 @@
 
   * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
   html, body { background: var(--bg-deep); color: var(--ink); font-family: var(--font-manrope), system-ui, sans-serif; font-weight: 300; letter-spacing: 0.01em; }
-  body { overflow-x: hidden; }
+  /* Clip horizontal bleed at the root so off-screen content (3D gallery peek-slides,
+     blobs, marquee) can never widen the layout and shove the fixed nav off-screen on
+     mobile. `clip` (not `hidden`) avoids creating a scroll container that would break
+     Lenis smooth scroll. */
+  html, body { overflow-x: clip; max-width: 100%; }
 
   .font-display { font-family: var(--font-bodoni), 'Times New Roman', serif; font-weight: 400; font-optical-sizing: auto; }
 
@@ -84,7 +88,7 @@
   .init-hidden { opacity: 0; }
 
   /* ===== SECTIONS ===== */
-  .section { position: relative; min-height: auto; padding: 7rem 5vw 5rem; z-index: 3; display: flex; align-items: center; }
+  .section { position: relative; min-height: auto; padding: 7rem 5vw 5rem; z-index: 3; display: flex; align-items: center; overflow-x: clip; }
   .section-tight { padding: 5.5rem 5vw 4rem; }
   .section-hero { min-height: 100vh; padding-bottom: 0; }
   @media (max-width: 768px) { .section { padding: 5rem 6vw 3.5rem; } }
