@@ -63,7 +63,7 @@ export default function Hero({ play }: { play: boolean }) {
             visit to final handover.
           </motion.p>
 
-          <motion.div className="mt-12 flex flex-wrap items-center gap-6" {...blur(0.7)}>
+          <motion.div className="hero-cta mt-12 flex flex-wrap items-center gap-6" {...blur(0.7)}>
             <a href="#contact" className="cta-btn solid">
               See the Work <span className="arrow" />
             </a>

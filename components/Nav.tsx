@@ -71,7 +71,7 @@ export default function Nav() {
               {l.label}
             </a>
           ))}
-          <div className="mt-10 text-[10px] tracking-[0.36em] uppercase text-[var(--gold)]">
+          <div className="mt-6 text-[10px] tracking-[0.36em] uppercase text-[var(--gold)]">
             Deira · Dubai · United Arab Emirates
           </div>
         </div>
