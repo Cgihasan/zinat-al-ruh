@@ -125,18 +125,6 @@ export default function Contact() {
                 </div>
               </div>
             </div>
-            <div className="contact-row">
-              <div className="ic">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 6v6l4 2" />
-                </svg>
-              </div>
-              <div>
-                <div className="label-tiny">Hours</div>
-                <div className="val">Sun – Thu · 9 AM — 6 PM GST</div>
-              </div>
-            </div>
           </Reveal>
         </div>
 
