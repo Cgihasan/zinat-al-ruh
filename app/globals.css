@@ -623,6 +623,7 @@
 
   /* Wide horizontal team card */
   .team-card-wide { grid-template-columns: 320px 1fr; }
+  .team-card-wide .team-photo { aspect-ratio: auto; min-height: 100%; }
   .team-card-wide .team-info { padding: clamp(30px, 3vw, 48px); }
   .team-card-wide .team-info .bio { max-width: 70ch; }
   @media (max-width: 768px) { .team-card-wide { grid-template-columns: 1fr; } }
