@@ -1,3 +1,11 @@
 {
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.zinatalruh.com" }],
+      "destination": "https://zinatalruh.com/:path*",
+      "permanent": true
+    }
+  ]
 }
