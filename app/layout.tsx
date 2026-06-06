@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Bodoni_Moda, Manrope } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 
 const bodoni = Bodoni_Moda({
@@ -63,6 +64,8 @@ export const viewport: Viewport = {
   themeColor: '#001a2b',
 };
 
+const GA_MEASUREMENT_ID = 'G-L8RYJ29T70';
+
 const JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'GeneralContractor',
@@ -97,6 +100,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${bodoni.variable} ${manrope.variable}`}>
       <head>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </Script>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
