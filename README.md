@@ -15,6 +15,22 @@ npm run build    # production build
 npm start
 ```
 
+## Enquiry form email
+
+The enquiry form posts to `app/api/enquiry/route.ts`, which sends submissions to Web3Forms.
+
+1. Create a free Web3Forms access key.
+2. Add it to `.env.local` for local development:
+
+```bash
+WEB3FORMS_ACCESS_KEY=your_web3forms_access_key_here
+```
+
+3. Add the same `WEB3FORMS_ACCESS_KEY` environment variable in Vercel before deploying.
+
+If you prefer another free form backend later, Formspree can be used with the same client-side
+form and a small change inside the API route.
+
 ## How it works
 
 - **3D layer** (`components/three/`): a fixed full-viewport `<Canvas>` (client-only via

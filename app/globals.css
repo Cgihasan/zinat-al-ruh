@@ -850,6 +850,8 @@
   .enq-chevron { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--gold); pointer-events: none; }
   .enq-footer { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
   .enq-note { font-size: 11px; letter-spacing: 0.08em; color: var(--ink-mute); }
+  .enq-honeypot { position: absolute; left: -9999px; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+  .enq-error { margin: -2px 0 0; color: #ffd0c8; font-size: 13px; line-height: 1.6; }
   .enq-success { display: flex; align-items: flex-start; gap: 14px; padding: 18px 20px; background: rgba(195,154,74,0.08); border: 1px solid rgba(195,154,74,0.3); border-radius: 8px; }
 
   .lenis.lenis-stopped { overflow: hidden; }

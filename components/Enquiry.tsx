@@ -6,15 +6,35 @@ import { Reveal } from './Reveal';
 export default function Enquiry() {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
 
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
+    const formData = new FormData(form);
+
     setSending(true);
-    setTimeout(() => {
+    setSent(false);
+    setError('');
+
+    try {
+      const response = await fetch('/api/enquiry', {
+        method: 'POST',
+        body: formData,
+      });
+      const result = (await response.json()) as { message?: string };
+
+      if (!response.ok) {
+        throw new Error(result.message || 'Unable to send your enquiry right now.');
+      }
+
       setSent(true);
       form.reset();
-    }, 900);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to send your enquiry right now.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -48,6 +68,7 @@ export default function Enquiry() {
           </div>
 
           <form className="enquiry-form" onSubmit={onSubmit}>
+            <input type="text" name="company" tabIndex={-1} autoComplete="off" className="enq-honeypot" />
             <div className="enq-row">
               <div className="enq-field">
                 <label className="enq-label" htmlFor="enq-name">Full Name</label>
@@ -89,6 +110,8 @@ export default function Enquiry() {
                 placeholder="Tell us about your project — space type, size, timeline, or anything you'd like us to know."
               />
             </div>
+
+            {error ? <p className="enq-error" role="alert">{error}</p> : null}
 
             {!sent ? (
               <div className="enq-footer">
