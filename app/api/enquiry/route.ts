@@ -11,6 +11,7 @@ export async function POST(request: Request) {
   const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
 
   if (!accessKey) {
+    console.error('WEB3FORMS_ACCESS_KEY is missing from the deployment environment.');
     return NextResponse.json(
       { message: 'Email delivery is not configured yet. Please add WEB3FORMS_ACCESS_KEY.' },
       { status: 500 },
@@ -58,9 +59,19 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify(payload),
     });
-    const result = (await response.json()) as { success?: boolean; message?: string };
+    const contentType = response.headers.get('content-type') || '';
+    const result = contentType.includes('application/json')
+      ? ((await response.json()) as { success?: boolean; message?: string })
+      : {
+          success: false,
+          message: `Web3Forms returned ${response.status} ${response.statusText || 'without JSON'}.`,
+        };
 
     if (!response.ok || !result.success) {
+      console.error('Web3Forms rejected enquiry submission.', {
+        status: response.status,
+        message: result.message,
+      });
       return NextResponse.json(
         { message: result.message || 'Unable to send your enquiry right now.' },
         { status: 502 },
@@ -68,7 +79,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ message: 'Enquiry received.' });
-  } catch {
+  } catch (error) {
+    console.error('Failed to send enquiry through Web3Forms.', error);
     return NextResponse.json(
       { message: 'Unable to send your enquiry right now. Please try again later.' },
       { status: 502 },

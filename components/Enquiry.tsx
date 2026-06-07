@@ -22,7 +22,10 @@ export default function Enquiry() {
         method: 'POST',
         body: formData,
       });
-      const result = (await response.json()) as { message?: string };
+      const contentType = response.headers.get('content-type') || '';
+      const result = contentType.includes('application/json')
+        ? ((await response.json()) as { message?: string })
+        : { message: 'The enquiry email endpoint is not available on this deployment.' };
 
       if (!response.ok) {
         throw new Error(result.message || 'Unable to send your enquiry right now.');
